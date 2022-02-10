@@ -100,7 +100,7 @@ app.get("/make-reservation", async (req, res) => {
 	let cookies;
 	if (!sessionId) {
 		const loginBody = JSON.stringify({
-			email: "pierrejeanlef84150@gmail.com",
+			email: process.env.APP_BASICFITMAIL,
 			password: process.env.APP_BASICFITPASSWORD,
 			cardNumber: "",
 		});

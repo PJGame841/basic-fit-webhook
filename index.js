@@ -67,7 +67,7 @@ const cookieParser = (cookies) => {
 };
 
 app.get("/make-reservation", async (req, res) => {
-	const { specialCode } = req.query;
+	const { specialCode, sessionId } = req.query;
 
 	console.log("Received new booking request");
 
@@ -81,31 +81,37 @@ app.get("/make-reservation", async (req, res) => {
 
 	console.log("Booking request authorized !");
 	console.log("Logging to Basic-fit...");
+	let cookies;
+	if (!sessionId) {
+		const loginBody = JSON.stringify({
+			email: "pierrejeanlef84150@gmail.com",
+			password: process.env.APP_BASICFITPASSWORD,
+			cardNumber: "",
+		});
+		const loginHeaders = getHeaders("/login", "/authentication/login");
+		loginHeaders.mbfloginheadvform = "jk#Bea201";
+		const loginResponse = await fetch(
+			"https://my.basic-fit.com/authentication/login",
+			{ method: "POST", body: loginBody, headers: loginHeaders }
+		);
 
-	const loginBody = JSON.stringify({
-		email: "pierrejeanlef84150@gmail.com",
-		password: process.env.APP_BASICFITPASSWORD,
-		cardNumber: "",
-	});
-	const loginHeaders = getHeaders("/login", "/authentication/login");
-	loginHeaders.mbfloginheadvform = "jk#Bea201";
-	const loginResponse = await fetch(
-		"https://my.basic-fit.com/authentication/login",
-		{ method: "POST", body: loginBody, headers: loginHeaders }
-	);
+		console.log("Logged in ! Formatting...");
 
-	console.log("Logged in ! Formatting...");
+		const loginData = await loginResponse.json();
 
-	const loginData = await loginResponse.json();
-
-	if (!loginData.member) {
-		return setResponse(res, 400, { booked: false, message: loginData.message });
+		if (!loginData.member) {
+			return setResponse(res, 400, {
+				booked: false,
+				message: loginData.message,
+			});
+		}
+		cookies = loginResponse.headers.getAll("set-cookie");
+	} else {
+		cookies = [`connect.sid=${sessionId};`];
 	}
 
 	console.log("Logged to Basic-fit !");
 	console.log("Sending booking to Basic-fit...");
-
-	const cookies = loginResponse.headers.getAll("set-cookie");
 
 	const bookBody = JSON.stringify({
 		doorPolicy: {
@@ -144,6 +150,7 @@ app.get("/make-reservation", async (req, res) => {
 	const bookData = await bookResponse.json();
 
 	if (!bookData.message || bookData.message != "Booked") {
+		console.log("Booking error", bookResponse.status, bookData);
 		return setResponse(res, 400, {
 			booked: false,
 			message: bookData.message || "Error while booking !",

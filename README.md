@@ -11,4 +11,9 @@ You have two env variables to setup:
 - APP_BASICFITMAIL (your basic fit email)
 - APP_BASICFITPASSWORD (your basic fit password)
 
+## Endpoints
+
+/make-reservation?specialCode=APP_SPECIALCODE&sessionId=<connect.sid header> -- the sessionId parameter is optionnal, if it's not provided, it'll try to login to basic fit
+/test -- used to check the next booking hour
+
 Good luck !

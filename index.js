@@ -69,6 +69,8 @@ const cookieParser = (cookies) => {
 app.get("/make-reservation", async (req, res) => {
 	const { specialCode } = req.query;
 
+	console.log("Received new booking request");
+
 	if (!specialCode || specialCode != process.env.APP_SPECIALCODE) {
 		// Just a simple check to make sure it's me
 		return setResponse(res, 401, {
@@ -76,6 +78,9 @@ app.get("/make-reservation", async (req, res) => {
 			message: "Wrong special code !",
 		});
 	}
+
+	console.log("Booking request authorized !");
+	console.log("Logging to Basic-fit...");
 
 	const loginBody = JSON.stringify({
 		email: "pierrejeanlef84150@gmail.com",
@@ -94,6 +99,9 @@ app.get("/make-reservation", async (req, res) => {
 	if (!loginData.member) {
 		return setResponse(res, 400, { booked: false, message: loginData.message });
 	}
+
+	console.log("Logged to Basic-fit !");
+	console.log("Sending booking to Basic-fit...");
 
 	const cookies = loginResponse.headers.getAll("set-cookie");
 
@@ -139,6 +147,8 @@ app.get("/make-reservation", async (req, res) => {
 			message: bookData.message || "Error while booking !",
 		});
 	}
+
+	console.log("Booking done !");
 
 	setResponse(res, 200, { booked: true });
 });

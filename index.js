@@ -10,6 +10,22 @@ const setResponse = (res, code, data) => {
 	return res.status(code).send(JSON.stringify(data));
 };
 
+const myFavoriteClub = {
+	name: "Saint-Clément-de-Rivière Impasse des Églantiers",
+	id: "ccefea76-8277-4141-b9e2-ff15fd94b0e5",
+	country: "France",
+	bookable: true,
+	status: null,
+	debt_check: false,
+	label_name: "1452",
+	longitude: 3.85049,
+	latitude: 43.65071,
+	blocked_countries: null,
+	mbf_payment_page_disabled__c: false,
+	rules_label: "1347",
+	terms_label: "1456",
+};
+
 const getHeaders = (origin, path) => {
 	// example origin: /gym-time-booking || example path: /door-policy/book-door-policy
 	return {
@@ -121,21 +137,9 @@ app.get("/make-reservation", async (req, res) => {
 			lastSlot: false,
 		},
 		duration: "90",
-		clubOfChoice: {
-			name: "Saint-Clément-de-Rivière Impasse des Églantiers",
-			id: "ccefea76-8277-4141-b9e2-ff15fd94b0e5",
-			country: "France",
-			bookable: true,
-			status: null,
-			debt_check: false,
-			label_name: "1452",
-			longitude: 3.85049,
-			latitude: 43.65071,
-			blocked_countries: null,
-			mbf_payment_page_disabled__c: false,
-			rules_label: "1347",
-			terms_label: "1456",
-		},
+		clubOfChoice: loginData
+			? loginData.member["favorite_club"]
+			: myFavoriteClub,
 	});
 	const bookHeaders = getHeaders(
 		"/gym-time-booking",

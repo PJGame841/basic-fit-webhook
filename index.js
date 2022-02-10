@@ -94,6 +94,8 @@ app.get("/make-reservation", async (req, res) => {
 		{ method: "POST", body: loginBody, headers: loginHeaders }
 	);
 
+	console.log("Logged in ! Formatting...");
+
 	const loginData = await loginResponse.json();
 
 	if (!loginData.member) {

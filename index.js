@@ -98,6 +98,8 @@ app.get("/make-reservation", async (req, res) => {
 	console.log("Booking request authorized !");
 	console.log("Logging to Basic-fit...");
 	let cookies;
+	let club = myFavoriteClub;
+
 	if (!sessionId) {
 		const loginBody = JSON.stringify({
 			email: process.env.APP_BASICFITMAIL,
@@ -121,7 +123,9 @@ app.get("/make-reservation", async (req, res) => {
 				message: loginData.message,
 			});
 		}
+
 		cookies = loginResponse.headers.getAll("set-cookie");
+		club = loginData.member["favorite_club"];
 	} else {
 		cookies = [`connect.sid=${sessionId};`];
 	}
@@ -137,9 +141,7 @@ app.get("/make-reservation", async (req, res) => {
 			lastSlot: false,
 		},
 		duration: "90",
-		clubOfChoice: loginData
-			? loginData.member["favorite_club"]
-			: myFavoriteClub,
+		clubOfChoice: club,
 	});
 	const bookHeaders = getHeaders(
 		"/gym-time-booking",
